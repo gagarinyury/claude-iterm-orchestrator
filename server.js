@@ -79,6 +79,41 @@ server.registerTool(
 );
 
 server.registerTool(
+  "create_worker_claude",
+  {
+    description:
+      "Create a new worker in iTerm2 tab and auto-start Claude CLI (supports claude or claude+ for bypass mode)",
+    inputSchema: {
+      name: z.string().describe("Worker name"),
+      task: z.string().optional().describe("Task description"),
+      claude_command: z
+        .string()
+        .optional()
+        .describe(
+          "Claude command to run: 'claude' or 'claude+' (default: 'claude')"
+        ),
+    },
+  },
+  async ({ name, task, claude_command }) => {
+    const result = await runScript("create-worker-claude.sh", [
+      name,
+      task || "No task",
+      claude_command || "claude",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ create_worker_claude\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
   "send_to_worker",
   {
     description:
@@ -463,7 +498,7 @@ server.registerTool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (15 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (16 tools registered)");
 }
 
 main().catch((error) => {

@@ -92,6 +92,7 @@ describe("MCP Server V2", () => {
           clearTimeout(timeout);
           try {
             expect(toolsResponse).toContain("create_worker");
+            expect(toolsResponse).toContain("create_worker_claude");
             expect(toolsResponse).toContain("send_to_worker");
             expect(toolsResponse).toContain("send_to_claude");
             expect(toolsResponse).toContain("read_from_worker");
@@ -148,6 +149,7 @@ describe("Script Validation", () => {
     const scriptsDir = "scripts";
     const requiredScripts = [
       "create-worker.sh",
+      "create-worker-claude.sh",
       "send-command.sh",
       "send-to-claude-v3.sh",
       "read-output.sh",
