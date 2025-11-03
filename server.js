@@ -82,7 +82,7 @@ server.registerTool(
   "create_worker_claude",
   {
     description:
-      "Create a new worker in iTerm2 tab and auto-start Claude CLI (supports claude or claude+ for bypass mode)",
+      "Create a new worker in iTerm2 tab and auto-start Claude CLI (default: claude+ bypass mode)",
     inputSchema: {
       name: z.string().describe("Worker name"),
       task: z.string().optional().describe("Task description"),
@@ -90,7 +90,7 @@ server.registerTool(
         .string()
         .optional()
         .describe(
-          "Claude command to run: 'claude' or 'claude+' (default: 'claude')"
+          "Claude command to run: 'claude' or 'claude+' (default: 'claude+')"
         ),
     },
   },
@@ -98,7 +98,7 @@ server.registerTool(
     const result = await runScript("create-worker-claude.sh", [
       name,
       task || "No task",
-      claude_command || "claude",
+      claude_command || "claude+",
     ]);
     return {
       content: [

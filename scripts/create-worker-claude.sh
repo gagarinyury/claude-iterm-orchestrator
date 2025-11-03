@@ -5,7 +5,7 @@
 
 WORKER_NAME="${1:-Worker}"
 TASK="${2:-No task}"
-CLAUDE_CMD="${3:-claude}"  # Default: "claude", can use "claude+" for bypass
+CLAUDE_CMD="${3:-claude+}"  # Default: "claude+" (bypass mode), can use "claude" for normal
 WORKER_ID="worker-$(date +%s)-$(openssl rand -hex 3)"
 
 # Create Python script

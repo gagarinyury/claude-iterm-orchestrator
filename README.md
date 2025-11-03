@@ -163,6 +163,49 @@ claude-iterm-orchestrator/
 - **Python** ≥ 3.8.0
 - **iTerm2** with Python API enabled
 - **macOS** (iTerm2 is macOS-only)
+- **Claude CLI** with `claude+` alias (recommended for orchestration)
+
+### Setting up `claude+` alias
+
+For orchestration, workers need to run in bypass mode (skip permissions). Add this alias to your shell:
+
+**macOS (Zsh - default):**
+```bash
+# Add to ~/.zshrc
+alias claude+='claude --dangerously-skip-permissions'
+```
+
+**macOS (Bash):**
+```bash
+# Add to ~/.bash_profile or ~/.bashrc
+alias claude+='claude --dangerously-skip-permissions'
+```
+
+**Linux:**
+```bash
+# Add to ~/.bashrc (or ~/.bash_aliases on Debian/Ubuntu)
+alias claude+='claude --dangerously-skip-permissions'
+```
+
+**After adding, reload your shell:**
+```bash
+# For zsh (macOS default)
+source ~/.zshrc
+
+# For bash (Linux / older macOS)
+source ~/.bashrc  # or ~/.bash_profile
+```
+
+**Verify it works:**
+```bash
+claude+ --version  # Should work without asking
+```
+
+> **Why bypass mode?** Workers need to operate autonomously without blocking on permission prompts. This allows the orchestrator to manage multiple workers efficiently.
+
+> **Note:** Only use bypass mode for trusted orchestrator tasks. For normal interactive use, use `claude` without the alias.
+
+> **Platform compatibility:** This alias syntax works on macOS, Linux, and Unix-like systems using bash or zsh shells.
 
 ---
 
