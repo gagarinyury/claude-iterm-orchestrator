@@ -5,7 +5,7 @@
  * Uses McpServer API with registerTool
  */
 
-import { exec } from "node:child_process";
+import { execFile } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -13,7 +13,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const execPromise = promisify(exec);
+const execFilePromise = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const scriptsDir = join(__dirname, "scripts");
 
@@ -23,12 +23,11 @@ console.error(`📁 Scripts directory: ${scriptsDir}`);
 // Helper: Execute a script and return result
 async function runScript(scriptName, args = []) {
   const scriptPath = join(scriptsDir, scriptName);
-  const command = `bash "${scriptPath}" ${args.join(" ")}`;
 
-  console.error(`🔧 Executing: ${command}`);
+  console.error(`🔧 Executing: bash ${scriptPath} ${args.join(" ")}`);
 
   try {
-    const { stdout, stderr } = await execPromise(command, {
+    const { stdout, stderr } = await execFilePromise('bash', [scriptPath, ...args], {
       timeout: 30000,
       maxBuffer: 1024 * 1024,
     });
@@ -42,6 +41,47 @@ async function runScript(scriptName, args = []) {
     console.error(`❌ Script error: ${error.message}`);
     return { success: false, error: error.message };
   }
+}
+
+// Helper: Get current session's worker_id from iTerm
+async function getCurrentWorkerId() {
+  try {
+    const result = await runScript("get-current-worker-id.sh", []);
+
+    if (result.success) {
+      const data = JSON.parse(result.output);
+      return data.worker_id || null;
+    }
+  } catch (e) {
+    console.error(`⚠️  Could not get current worker_id: ${e.message}`);
+  }
+
+  return null;
+}
+
+// Helper: Ensure current session is registered as orchestrator
+async function ensureOrchestratorRegistered() {
+  let currentId = await getCurrentWorkerId();
+
+  // If no worker_id exists, we need to initialize as orchestrator
+  if (!currentId) {
+    const orchestratorId = `orchestrator-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    console.error(`🎭 No worker_id found. Registering as orchestrator: ${orchestratorId}`);
+
+    // Call get_role_instructions to register
+    const result = await runScript("get-role-instructions.sh", [orchestratorId]);
+
+    if (result.success) {
+      console.error(`✅ Registered as orchestrator: ${orchestratorId}`);
+      return orchestratorId;
+    } else {
+      console.error(`❌ Failed to register orchestrator: ${result.error}`);
+      return null;
+    }
+  }
+
+  console.error(`ℹ️  Already registered with worker_id: ${currentId}`);
+  return currentId;
 }
 
 // Create MCP server
@@ -95,10 +135,14 @@ server.registerTool(
     },
   },
   async ({ name, task, claude_command }) => {
+    // Automatically register as orchestrator if needed
+    const parentId = await ensureOrchestratorRegistered();
+
     const result = await runScript("create-worker-claude.sh", [
       name,
       task || "No task",
       claude_command || "claude+",
+      parentId || "",  // Pass parent_id to script
     ]);
     return {
       content: [
@@ -124,10 +168,9 @@ server.registerTool(
     },
   },
   async ({ worker_id, message }) => {
-    const escapedMessage = message.replace(/'/g, "'\\''");
     const result = await runScript("send-command.sh", [
       worker_id,
-      `'${escapedMessage}'`,
+      message,
     ]);
     return {
       content: [
@@ -152,10 +195,9 @@ server.registerTool(
     },
   },
   async ({ worker_id, message }) => {
-    const escapedMessage = message.replace(/'/g, "'\\''");
     const result = await runScript("send-to-claude-v3.sh", [
       worker_id,
-      `'${escapedMessage}'`,
+      message,
     ]);
     return {
       content: [
@@ -417,14 +459,10 @@ server.registerTool(
     },
   },
   async ({ worker_id, task_id, result }) => {
-    const escapedResult = (result || "Task completed successfully").replace(
-      /'/g,
-      "'\\''"
-    );
     const scriptResult = await runScript("complete-task.sh", [
       worker_id,
       task_id,
-      `'${escapedResult}'`,
+      result || "Task completed successfully",
     ]);
     return {
       content: [
@@ -476,10 +514,9 @@ server.registerTool(
     },
   },
   async ({ worker_id, question }) => {
-    const escapedQuestion = question.replace(/'/g, "'\\''");
     const result = await runScript("ask-orchestrator.sh", [
       worker_id,
-      `'${escapedQuestion}'`,
+      question,
     ]);
     return {
       content: [

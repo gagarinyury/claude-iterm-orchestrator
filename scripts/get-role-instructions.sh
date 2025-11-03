@@ -94,17 +94,26 @@ async def main(connection):
             role = "orchestrator"
             instructions = ORCHESTRATOR_INSTRUCTIONS.format(worker_id=MY_WORKER_ID)
 
-            # Set role variable for self
-            for window in app.windows:
-                for tab in window.tabs:
-                    for session in tab.sessions:
-                        try:
-                            wid = await session.async_get_variable("user.worker_id")
-                            if wid == MY_WORKER_ID:
-                                await session.async_set_variable("user.role", "orchestrator")
-                                break
-                        except:
-                            pass
+            # Register current session as orchestrator
+            import time
+            current_session = app.current_terminal_window.current_tab.current_session
+
+            # Check if worker_id already exists
+            existing_wid = None
+            try:
+                existing_wid = await current_session.async_get_variable("user.worker_id")
+            except:
+                pass
+
+            # If no worker_id exists, set MY_WORKER_ID
+            if not existing_wid:
+                await current_session.async_set_variable("user.worker_id", MY_WORKER_ID)
+                await current_session.async_set_variable("user.worker_name", "Orchestrator")
+                await current_session.async_set_variable("user.created_at", str(int(time.time())))
+
+            # Set orchestrator role and status
+            await current_session.async_set_variable("user.role", "orchestrator")
+            await current_session.async_set_variable("user.status", "active")
 
             result = {
                 "success": True,

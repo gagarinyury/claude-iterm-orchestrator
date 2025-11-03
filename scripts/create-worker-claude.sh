@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Create a new worker in iTerm2 and auto-start Claude CLI
-# Usage: create-worker-claude.sh <name> [task] [claude_command]
+# Usage: create-worker-claude.sh <name> [task] [claude_command] [parent_id]
 
 WORKER_NAME="${1:-Worker}"
 TASK="${2:-No task}"
 CLAUDE_CMD="${3:-claude+}"  # Default: "claude+" (bypass mode), can use "claude" for normal
+PARENT_ID="${4:-}"  # Optional: parent orchestrator ID
 WORKER_ID="worker-$(date +%s)-$(openssl rand -hex 3)"
 
 # Create Python script
@@ -31,20 +32,26 @@ async def main(connection):
 
         # Find orchestrator
         orchestrator_id = None
-        for win in app.windows:
-            for t in win.tabs:
-                for s in t.sessions:
-                    try:
-                        role = await s.async_get_variable("user.role")
-                        if role == "orchestrator":
-                            orchestrator_id = await s.async_get_variable("user.worker_id")
-                            break
-                    except:
-                        pass
+
+        # First, check if parent_id was provided
+        if "$PARENT_ID":
+            orchestrator_id = "$PARENT_ID"
+        else:
+            # Search for orchestrator in iTerm sessions
+            for win in app.windows:
+                for t in win.tabs:
+                    for s in t.sessions:
+                        try:
+                            role = await s.async_get_variable("user.role")
+                            if role == "orchestrator":
+                                orchestrator_id = await s.async_get_variable("user.worker_id")
+                                break
+                        except:
+                            pass
+                    if orchestrator_id:
+                        break
                 if orchestrator_id:
                     break
-            if orchestrator_id:
-                break
 
         # Set worker variables
         await session.async_set_variable("user.worker_id", "$WORKER_ID")
@@ -53,6 +60,8 @@ async def main(connection):
         await session.async_set_variable("user.task", "$TASK")
         await session.async_set_variable("user.created_at", "$(date +%s)")
         await session.async_set_variable("user.role", "worker")
+
+        # Always set parent_id if found
         if orchestrator_id:
             await session.async_set_variable("user.parent_id", orchestrator_id)
 
