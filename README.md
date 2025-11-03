@@ -44,22 +44,37 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ---
 
-## 📦 Available Tools (9)
+## 📦 Available Tools (16)
 
-### 1️⃣ Worker Lifecycle
+> **🗺️ Future features:** See [ROADMAP.md](ROADMAP.md) for planned features and milestones
+
+### 1️⃣ Worker Lifecycle (4)
 - **create_worker** - Create new worker in iTerm tab
+- **create_worker_claude** - Create worker and auto-start Claude CLI
 - **kill_worker** - Close worker tab
 - **list_workers** - List all active workers
 - **get_worker_info** - Get detailed worker info
 
-### 2️⃣ Communication
+### 2️⃣ Communication (3)
 - **send_to_worker** - Send text (no Enter)
 - **send_to_claude** - Send text + Enter (for Claude CLI)
 - **read_from_worker** - Read terminal output
 
-### 3️⃣ Variables
+### 3️⃣ Variables (2)
 - **set_variable** - Store data in worker session
 - **get_variable** - Retrieve stored data
+
+### 4️⃣ Advanced Monitoring (2)
+- **set_tab_color** - Set tab color for visual identification
+- **monitor_variable** - Monitor variable changes over time
+
+### 5️⃣ Task Management (2)
+- **assign_task** - Assign task to worker with metadata
+- **complete_task** - Mark task as completed with result
+
+### 6️⃣ Orchestrator System (2)
+- **get_role_instructions** - Get role (orchestrator/worker) and instructions
+- **ask_orchestrator** - Send question from worker to orchestrator
 
 ---
 
@@ -87,21 +102,27 @@ iTerm2 Python API
 
 ```
 claude-iterm-orchestrator/
-├── server.js              ← MCP server (270 lines)
-├── scripts/               ← 9 bash scripts
+├── server.js              ← MCP server (500 lines)
+├── scripts/               ← 16 bash scripts
 │   ├── create-worker.sh
+│   ├── create-worker-claude.sh
 │   ├── send-to-claude-v3.sh
 │   ├── read-output.sh
 │   ├── set-variable.sh
 │   ├── get-variable.sh
-│   └── ... (4 more)
+│   ├── assign-task.sh
+│   ├── complete-task.sh
+│   ├── get-role-instructions.sh
+│   ├── ask-orchestrator.sh
+│   └── ... (6 more)
 ├── tests/                 ← Test suite
 │   └── server.test.js     ← 7 tests (100% passing)
 ├── biome.json             ← Linter config
 ├── vitest.config.js       ← Test config
 ├── package.json
 ├── README.md              ← Main docs
-└── TESTING.md             ← Testing guide
+├── TESTING.md             ← Testing guide
+└── ROADMAP.md             ← Future features
 ```
 
 ---
@@ -264,8 +285,18 @@ MIT
 |--------|--------|
 | **Tests** | ✅ 7/7 passing (100%) |
 | **Linting** | ✅ All checks passed |
-| **Tools** | ✅ 9/9 working |
+| **Tools** | ✅ 16/16 working |
 | **Coverage** | MCP Protocol, Scripts, Config |
 | **Platform** | macOS (iTerm2) |
 
 **Last verified:** 2025-01-03
+
+---
+
+## 🗺️ Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for:
+- 14 planned features
+- Implementation priorities
+- Future milestones (v2.0 - v3.1)
+- Interactive UX, advanced control, visual management
