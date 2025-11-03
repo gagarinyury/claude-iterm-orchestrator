@@ -27,12 +27,32 @@ async def main(connection):
             tab = await window.async_create_tab()
             session = tab.current_session
 
+        # Find orchestrator
+        orchestrator_id = None
+        for win in app.windows:
+            for t in win.tabs:
+                for s in t.sessions:
+                    try:
+                        role = await s.async_get_variable("user.role")
+                        if role == "orchestrator":
+                            orchestrator_id = await s.async_get_variable("user.worker_id")
+                            break
+                    except:
+                        pass
+                if orchestrator_id:
+                    break
+            if orchestrator_id:
+                break
+
         # Set worker variables
         await session.async_set_variable("user.worker_id", "$WORKER_ID")
         await session.async_set_variable("user.worker_name", "$WORKER_NAME")
         await session.async_set_variable("user.status", "idle")
         await session.async_set_variable("user.task", "$TASK")
         await session.async_set_variable("user.created_at", "$(date +%s)")
+        await session.async_set_variable("user.role", "worker")
+        if orchestrator_id:
+            await session.async_set_variable("user.parent_id", orchestrator_id)
 
         # Set tab title
         await tab.async_set_title("$WORKER_NAME")

@@ -100,6 +100,12 @@ describe("MCP Server V2", () => {
             expect(toolsResponse).toContain("get_worker_info");
             expect(toolsResponse).toContain("set_variable");
             expect(toolsResponse).toContain("get_variable");
+            expect(toolsResponse).toContain("set_tab_color");
+            expect(toolsResponse).toContain("monitor_variable");
+            expect(toolsResponse).toContain("assign_task");
+            expect(toolsResponse).toContain("complete_task");
+            expect(toolsResponse).toContain("get_role_instructions");
+            expect(toolsResponse).toContain("ask_orchestrator");
             resolve();
           } catch (err) {
             reject(err);
@@ -150,6 +156,12 @@ describe("Script Validation", () => {
       "get-worker-info.sh",
       "set-variable.sh",
       "get-variable.sh",
+      "set-tab-color.sh",
+      "monitor-variable.sh",
+      "assign-task.sh",
+      "complete-task.sh",
+      "get-role-instructions.sh",
+      "ask-orchestrator.sh",
     ];
 
     for (const script of requiredScripts) {

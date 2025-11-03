@@ -24,6 +24,8 @@ async def main(connection):
                             status = await session.async_get_variable("user.status") or "unknown"
                             task = await session.async_get_variable("user.task") or "No task"
                             created_at = await session.async_get_variable("user.created_at") or "0"
+                            role = await session.async_get_variable("user.role") or "unknown"
+                            parent_id = await session.async_get_variable("user.parent_id") or None
 
                             workers.append({
                                 "worker_id": worker_id,
@@ -31,6 +33,8 @@ async def main(connection):
                                 "status": status,
                                 "task": task,
                                 "created_at": created_at,
+                                "role": role,
+                                "parent_id": parent_id,
                                 "session_id": session.session_id
                             })
                     except:

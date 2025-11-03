@@ -277,11 +277,193 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "set_tab_color",
+  {
+    description:
+      "Set tab color for a worker (supports: red, green, blue, yellow, cyan, magenta, orange, purple, pink, gray, white, black, or rgb(r,g,b))",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID"),
+      color: z
+        .string()
+        .describe("Color name or RGB format (e.g., 'red' or 'rgb(255,0,0)')"),
+    },
+  },
+  async ({ worker_id, color }) => {
+    const result = await runScript("set-tab-color.sh", [worker_id, color]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ set_tab_color\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "monitor_variable",
+  {
+    description:
+      "Monitor a variable for changes in a worker for specified duration",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID"),
+      key: z.string().describe("Variable name to monitor"),
+      duration: z
+        .number()
+        .optional()
+        .describe("Duration in seconds (default: 10)"),
+    },
+  },
+  async ({ worker_id, key, duration }) => {
+    const result = await runScript("monitor-variable.sh", [
+      worker_id,
+      key,
+      duration || 10,
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ monitor_variable\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "assign_task",
+  {
+    description: "Assign a task to a worker",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID"),
+      task_id: z.string().describe("Unique task identifier"),
+      task_description: z.string().describe("Task description"),
+    },
+  },
+  async ({ worker_id, task_id, task_description }) => {
+    const result = await runScript("assign-task.sh", [
+      worker_id,
+      task_id,
+      task_description,
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ assign_task\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "complete_task",
+  {
+    description: "Mark a task as completed for a worker",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID"),
+      task_id: z.string().describe("Task identifier to complete"),
+      result: z
+        .string()
+        .optional()
+        .describe(
+          "Task result or outcome (default: 'Task completed successfully')"
+        ),
+    },
+  },
+  async ({ worker_id, task_id, result }) => {
+    const escapedResult = (result || "Task completed successfully").replace(
+      /'/g,
+      "'\\''"
+    );
+    const scriptResult = await runScript("complete-task.sh", [
+      worker_id,
+      task_id,
+      `'${escapedResult}'`,
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: scriptResult.success
+            ? `✅ complete_task\n\n${scriptResult.output}`
+            : `❌ Failed\n\n${scriptResult.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "get_role_instructions",
+  {
+    description:
+      "Get role (orchestrator/worker) and instructions for current Claude instance. Call this first when starting!",
+    inputSchema: {
+      my_worker_id: z
+        .string()
+        .describe("Your worker ID (from create_worker result or environment)"),
+    },
+  },
+  async ({ my_worker_id }) => {
+    const result = await runScript("get-role-instructions.sh", [my_worker_id]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ get_role_instructions\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "ask_orchestrator",
+  {
+    description:
+      "Send a question to the orchestrator (only for workers). Orchestrator will see your message in their terminal.",
+    inputSchema: {
+      worker_id: z.string().describe("Your worker ID"),
+      question: z.string().describe("Question to ask the orchestrator"),
+    },
+  },
+  async ({ worker_id, question }) => {
+    const escapedQuestion = question.replace(/'/g, "'\\''");
+    const result = await runScript("ask-orchestrator.sh", [
+      worker_id,
+      `'${escapedQuestion}'`,
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ ask_orchestrator\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
 // Start server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (9 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (15 tools registered)");
 }
 
 main().catch((error) => {
