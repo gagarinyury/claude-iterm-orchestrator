@@ -11,6 +11,40 @@ Control multiple Claude CLI instances in separate iTerm tabs through a clean MCP
 
 ---
 
+## 💰 Why Use This? The Economics
+
+**Use your Claude Pro/Max subscription instead of paying per-token API costs for multi-agent systems!**
+
+### Cost Comparison
+
+| Approach | Cost/Month | Limits | Multi-Agent Cost |
+|----------|------------|--------|------------------|
+| **Anthropic API** | Pay per token | $3-15 per 1M tokens | Scales linearly 💸 |
+| **Claude Pro + Orchestrator** | $20 fixed | ~300K tokens/day | ✅ **Unlimited agents!** |
+| **Claude Max + Orchestrator** | $100 fixed | 2-3x more usage | ✅ **Even more agents!** |
+
+### Real Example: 5 Agents Working 4 Hours/Day
+
+- **Tokens per day**: ~2.5M
+- **API cost**: $7.50-$37.50/day = **$225-$1,125/month** 💸
+- **Claude Pro cost**: **$20/month** (fixed) ✅
+- **Your savings**: **$205-$1,105/month** 🎉
+
+### When to Use Orchestrator?
+
+✅ You have Claude Pro or Claude Max subscription
+✅ You run 2+ agents regularly
+✅ You process 100K+ tokens/day
+✅ You want predictable costs
+
+### When to Use API Directly?
+
+Use API if you process <50K tokens/day or use Claude sporadically.
+
+> **💡 Pro tip**: One Claude Max subscription ($100/month) can power 10+ parallel agents working full-time, vs $2,000+/month on API!
+
+---
+
 ## ✨ Features
 
 - 🪟 **Worker Management** - Create/kill workers in iTerm tabs
