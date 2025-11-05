@@ -81,11 +81,13 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ---
 
-## 📦 Available Tools (22)
+## 📦 Available Tools (33)
 
 > **🗺️ Future features:** See [ROADMAP.md](ROADMAP.md) for planned features and milestones
 >
 > **✅ Sprint 1 Complete!** Rate limiting, monitoring, and cost tracking tools added!
+>
+> **✅ Sprint 2 Complete!** Load balancing, caching, auto-scaling, and setup wizard added!
 
 ### 1️⃣ Worker Lifecycle (6)
 - **create_worker** - Create new worker in iTerm tab
@@ -124,6 +126,25 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 ### 8️⃣ Cost Analysis (2) 🆕
 - **estimate_tokens** - Estimate token usage for period (today/week/month)
 - **cost_estimator** - Calculate cost savings vs API
+
+### 9️⃣ Load Balancing (3) 🚀 Sprint 2
+- **load_balancer_assign** - Assign task through load balancer with priority
+- **load_balancer_status** - Get load balancer utilization and capacity
+- **task_queue_status** - Get task queue status (by priority)
+
+### 🔟 Caching (3) 🚀 Sprint 2
+- **cache_get** - Get value from cache (saves tokens!)
+- **cache_set** - Set value in cache with TTL
+- **cache_stats** - Get cache statistics (hits, misses, tokens saved)
+
+### 1️⃣1️⃣ Auto-Scaling (4) 🚀 Sprint 2
+- **auto_scale_evaluate** - Evaluate load and trigger scaling
+- **auto_scale_enable** - Enable automatic worker scaling
+- **auto_scale_disable** - Disable automatic scaling
+- **auto_scale_status** - Get auto-scaling config and state
+
+### 1️⃣2️⃣ Setup & Configuration (1) 🚀 Sprint 2
+- **run_setup_wizard** - Interactive setup wizard for first-time users
 
 ---
 

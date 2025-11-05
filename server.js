@@ -658,11 +658,265 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "load_balancer_assign",
+  {
+    description: "Assign task through load balancer (smart distribution with priority)",
+    inputSchema: {
+      task: z.string().describe("Task to assign"),
+      priority: z
+        .string()
+        .optional()
+        .describe("Priority: high, medium, low (default: medium)"),
+    },
+  },
+  async ({ task, priority }) => {
+    const result = await runScript("load-balancer.sh", [
+      "assign",
+      task,
+      priority || "medium",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ load_balancer_assign\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "load_balancer_status",
+  {
+    description: "Get load balancer status (utilization, queues, capacity)",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("load-balancer.sh", ["status"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ load_balancer_status\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "task_queue_status",
+  {
+    description: "Get task queue status (by priority: high, medium, low)",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("task-queue.sh", ["status"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ task_queue_status\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "cache_get",
+  {
+    description: "Get value from cache (saves tokens on repeated queries)",
+    inputSchema: {
+      key: z.string().describe("Cache key"),
+    },
+  },
+  async ({ key }) => {
+    const result = await runScript("cache-get.sh", [key]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ cache_get\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "cache_set",
+  {
+    description: "Set value in cache with optional TTL",
+    inputSchema: {
+      key: z.string().describe("Cache key"),
+      value: z.string().describe("Value to cache (JSON string)"),
+      ttl: z
+        .number()
+        .optional()
+        .describe("Time to live in seconds (default: 3600)"),
+    },
+  },
+  async ({ key, value, ttl }) => {
+    const result = await runScript("cache-set.sh", [
+      key,
+      value,
+      ttl ? ttl.toString() : "3600",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ cache_set\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "cache_stats",
+  {
+    description: "Get cache statistics (hits, misses, tokens saved)",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("cache-stats.sh", []);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ cache_stats\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "auto_scale_evaluate",
+  {
+    description: "Evaluate current load and trigger auto-scaling if needed",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("auto-scale.sh", ["evaluate"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ auto_scale_evaluate\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "auto_scale_enable",
+  {
+    description: "Enable automatic worker scaling based on load",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("auto-scale.sh", ["enable"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ auto_scale_enable\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "auto_scale_disable",
+  {
+    description: "Disable automatic worker scaling",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("auto-scale.sh", ["disable"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ auto_scale_disable\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "auto_scale_status",
+  {
+    description: "Get auto-scaling status and configuration",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("auto-scale.sh", ["status"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ auto_scale_status\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "run_setup_wizard",
+  {
+    description: "Run interactive setup wizard for first-time configuration",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("setup-wizard.sh", []);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ run_setup_wizard\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
 // Start server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (22 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (33 tools registered)");
 }
 
 main().catch((error) => {

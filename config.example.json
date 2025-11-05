@@ -1,0 +1,39 @@
+{
+  "auto_scaling": {
+    "enabled": false,
+    "min_workers": 1,
+    "max_workers": 10,
+    "target_utilization": 0.7,
+    "scale_up_threshold": 0.8,
+    "scale_down_threshold": 0.3,
+    "idle_timeout_seconds": 600,
+    "cooldown_seconds": 120
+  },
+  "load_balancer": {
+    "max_concurrent_workers": 3,
+    "mode": "auto",
+    "distribution": "round-robin",
+    "throttle_enabled": true
+  },
+  "rate_limiter": {
+    "max_requests_per_minute": 50,
+    "max_requests_per_hour": 1000,
+    "warning_threshold": 0.8,
+    "pause_on_limit": true
+  },
+  "cache": {
+    "enabled": true,
+    "default_ttl": 3600,
+    "max_entries": 1000
+  },
+  "subscription": {
+    "type": "pro",
+    "monthly_cost": 20
+  },
+  "monitoring": {
+    "dashboard_refresh_seconds": 5,
+    "enable_alerts": true,
+    "alert_on_rate_limit": true,
+    "alert_on_high_queue": true
+  }
+}
