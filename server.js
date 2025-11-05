@@ -494,11 +494,175 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "check_rate_limit",
+  {
+    description: "Check current rate limit status to avoid hitting Claude Pro/Max limits",
+    inputSchema: {
+      worker_id: z.string().optional().describe("Worker ID (for tracking)"),
+    },
+  },
+  async ({ worker_id }) => {
+    const result = await runScript("rate-limiter.sh", [
+      "status",
+      worker_id || "unknown",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ check_rate_limit\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "get_queue_status",
+  {
+    description: "Get status of the request queue",
+    inputSchema: {},
+  },
+  async () => {
+    const result = await runScript("queue-manager.sh", ["status"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ get_queue_status\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "smart_restart_worker",
+  {
+    description: "Gracefully restart a worker with context preservation (useful on rate limit errors)",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID to restart"),
+      reason: z
+        .string()
+        .optional()
+        .describe("Reason for restart (default: 'manual_restart')"),
+    },
+  },
+  async ({ worker_id, reason }) => {
+    const result = await runScript("smart-restart.sh", [
+      worker_id,
+      reason || "manual_restart",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ smart_restart_worker\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "show_dashboard",
+  {
+    description: "Show visual dashboard with workers, rate limits, token usage, and cost savings",
+    inputSchema: {
+      subscription_type: z
+        .string()
+        .optional()
+        .describe("Subscription type: 'pro' or 'max' (default: 'pro')"),
+    },
+  },
+  async ({ subscription_type }) => {
+    const result = await runScript("show-dashboard.sh", [
+      subscription_type || "pro",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ show_dashboard\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "estimate_tokens",
+  {
+    description: "Estimate token usage for a period (today, week, month)",
+    inputSchema: {
+      period: z
+        .string()
+        .optional()
+        .describe("Period: 'today', 'week', 'month' (default: 'today')"),
+    },
+  },
+  async ({ period }) => {
+    const result = await runScript("estimate-tokens.sh", [period || "today"]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ estimate_tokens\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "cost_estimator",
+  {
+    description: "Calculate cost savings vs API usage",
+    inputSchema: {
+      period: z
+        .string()
+        .optional()
+        .describe("Period: 'today', 'week', 'month' (default: 'today')"),
+      subscription_type: z
+        .string()
+        .optional()
+        .describe("Subscription: 'pro' or 'max' (default: 'pro')"),
+    },
+  },
+  async ({ period, subscription_type }) => {
+    const result = await runScript("cost-estimator.sh", [
+      period || "today",
+      subscription_type || "pro",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ cost_estimator\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
 // Start server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (16 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (22 tools registered)");
 }
 
 main().catch((error) => {

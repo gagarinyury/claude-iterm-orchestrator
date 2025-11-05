@@ -52,6 +52,9 @@ Use API if you process <50K tokens/day or use Claude sporadically.
 - 💾 **Variables** - Store data in worker sessions
 - 🤖 **Claude Integration** - Direct communication with Claude CLI
 - 🔧 **Simple Architecture** - MCP server → Bash scripts → iTerm2 API
+- ⚡ **Rate Limiting** - Prevent hitting Claude Pro/Max limits
+- 📊 **Cost Tracking** - Monitor savings vs API costs
+- 🔄 **Smart Restart** - Graceful worker recovery with context preservation
 
 ---
 
@@ -78,16 +81,19 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ---
 
-## 📦 Available Tools (16)
+## 📦 Available Tools (22)
 
 > **🗺️ Future features:** See [ROADMAP.md](ROADMAP.md) for planned features and milestones
+>
+> **✅ Sprint 1 Complete!** Rate limiting, monitoring, and cost tracking tools added!
 
-### 1️⃣ Worker Lifecycle (4)
+### 1️⃣ Worker Lifecycle (6)
 - **create_worker** - Create new worker in iTerm tab
 - **create_worker_claude** - Create worker and auto-start Claude CLI
 - **kill_worker** - Close worker tab
 - **list_workers** - List all active workers
 - **get_worker_info** - Get detailed worker info
+- **smart_restart_worker** - Gracefully restart worker with context preservation
 
 ### 2️⃣ Communication (3)
 - **send_to_worker** - Send text (no Enter)
@@ -109,6 +115,15 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 ### 6️⃣ Orchestrator System (2)
 - **get_role_instructions** - Get role (orchestrator/worker) and instructions
 - **ask_orchestrator** - Send question from worker to orchestrator
+
+### 7️⃣ Rate Limiting & Monitoring (3) 🆕
+- **check_rate_limit** - Check current rate limit status
+- **get_queue_status** - Get status of request queue
+- **show_dashboard** - Visual dashboard with all metrics
+
+### 8️⃣ Cost Analysis (2) 🆕
+- **estimate_tokens** - Estimate token usage for period (today/week/month)
+- **cost_estimator** - Calculate cost savings vs API
 
 ---
 
