@@ -1,0 +1,60 @@
+{
+  "name": "Content Creation Pipeline",
+  "description": "5 workers for comprehensive content creation",
+  "workers": [
+    {
+      "name": "Researcher",
+      "task": "Research topics, gather information, fact-checking",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "Writer",
+      "task": "Write articles, blog posts, copy",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "Editor",
+      "task": "Edit, proofread, improve content quality",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "SEO-Specialist",
+      "task": "SEO optimization, keywords, meta descriptions",
+      "priority": "medium",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "Publisher",
+      "task": "Format, schedule, publish content",
+      "priority": "low",
+      "role": "worker",
+      "auto_start_claude": true
+    }
+  ],
+  "config": {
+    "load_balancer": {
+      "max_concurrent_workers": 4
+    },
+    "auto_scaling": {
+      "enabled": true,
+      "min_workers": 3,
+      "max_workers": 6
+    },
+    "cache": {
+      "enabled": true,
+      "default_ttl": 3600
+    }
+  },
+  "initial_tasks": [
+    "Research content topic",
+    "Create content outline",
+    "Write first draft"
+  ]
+}

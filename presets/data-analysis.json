@@ -1,0 +1,44 @@
+{
+  "name": "Data Analysis Pipeline",
+  "description": "3 workers for data analysis workflow",
+  "workers": [
+    {
+      "name": "DataETL",
+      "task": "Data extraction, transformation, loading, cleaning",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "Analysis",
+      "task": "Statistical analysis, ML models, insights",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "Visualization",
+      "task": "Charts, dashboards, reports, presentations",
+      "priority": "medium",
+      "role": "worker",
+      "auto_start_claude": true
+    }
+  ],
+  "config": {
+    "load_balancer": {
+      "max_concurrent_workers": 2
+    },
+    "auto_scaling": {
+      "enabled": false
+    },
+    "cache": {
+      "enabled": true,
+      "default_ttl": 7200
+    }
+  },
+  "initial_tasks": [
+    "Load and inspect dataset",
+    "Perform exploratory data analysis",
+    "Generate initial visualizations"
+  ]
+}

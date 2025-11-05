@@ -1,0 +1,47 @@
+{
+  "name": "Web Development Team",
+  "description": "4 workers for full-stack web development",
+  "workers": [
+    {
+      "name": "Frontend",
+      "task": "React/Vue development, UI components, styling",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "Backend",
+      "task": "API development, database, business logic",
+      "priority": "high",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "DevOps",
+      "task": "Docker, deployment, CI/CD, infrastructure",
+      "priority": "medium",
+      "role": "worker",
+      "auto_start_claude": true
+    },
+    {
+      "name": "QA-Tester",
+      "task": "Testing, bug reporting, quality assurance",
+      "priority": "medium",
+      "role": "worker",
+      "auto_start_claude": true
+    }
+  ],
+  "config": {
+    "load_balancer": {
+      "max_concurrent_workers": 3
+    },
+    "auto_scaling": {
+      "enabled": false
+    }
+  },
+  "initial_tasks": [
+    "Review project requirements",
+    "Set up development environment",
+    "Create initial project structure"
+  ]
+}

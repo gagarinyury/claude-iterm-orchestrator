@@ -912,11 +912,142 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "load_preset",
+  {
+    description: "Load preset configuration (web-dev, data-analysis, content-creation)",
+    inputSchema: {
+      preset_name: z.string().describe("Preset name to load"),
+    },
+  },
+  async ({ preset_name }) => {
+    const result = await runScript("load-preset.sh", [preset_name]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ load_preset\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "show_alert",
+  {
+    description: "Show alert dialog to user with custom buttons",
+    inputSchema: {
+      title: z.string().describe("Alert title"),
+      message: z.string().describe("Alert message"),
+      buttons: z
+        .string()
+        .optional()
+        .describe("Comma-separated buttons (default: OK)"),
+    },
+  },
+  async ({ title, message, buttons }) => {
+    const result = await runScript("show-alert.sh", [
+      title,
+      message,
+      buttons || "OK",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ show_alert\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "ask_user_input",
+  {
+    description: "Ask user for text input with modal dialog",
+    inputSchema: {
+      title: z.string().describe("Input dialog title"),
+      placeholder: z.string().optional().describe("Placeholder text"),
+      default_value: z.string().optional().describe("Default value"),
+    },
+  },
+  async ({ title, placeholder, default_value }) => {
+    const result = await runScript("ask-user-input.sh", [
+      title,
+      placeholder || "",
+      default_value || "",
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ ask_user_input\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "focus_worker",
+  {
+    description: "Bring worker tab to focus (switch to worker's tab)",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID to focus"),
+    },
+  },
+  async ({ worker_id }) => {
+    const result = await runScript("focus-worker.sh", [worker_id]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ focus_worker\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "inject_output",
+  {
+    description: "Inject text into worker terminal as program output",
+    inputSchema: {
+      worker_id: z.string().describe("Worker ID"),
+      text: z.string().describe("Text to inject"),
+    },
+  },
+  async ({ worker_id, text }) => {
+    const result = await runScript("inject-output.sh", [worker_id, text]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ inject_output\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
 // Start server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (33 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (38 tools registered)");
 }
 
 main().catch((error) => {

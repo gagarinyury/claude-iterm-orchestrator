@@ -81,13 +81,15 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ---
 
-## 📦 Available Tools (33)
+## 📦 Available Tools (38)
 
 > **🗺️ Future features:** See [ROADMAP.md](ROADMAP.md) for planned features and milestones
 >
 > **✅ Sprint 1 Complete!** Rate limiting, monitoring, and cost tracking tools added!
 >
 > **✅ Sprint 2 Complete!** Load balancing, caching, auto-scaling, and setup wizard added!
+>
+> **✅ Sprint 3 Complete!** Presets, interactive dialogs, worker control, and streaming added!
 
 ### 1️⃣ Worker Lifecycle (6)
 - **create_worker** - Create new worker in iTerm tab
@@ -145,6 +147,17 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ### 1️⃣2️⃣ Setup & Configuration (1) 🚀 Sprint 2
 - **run_setup_wizard** - Interactive setup wizard for first-time users
+
+### 1️⃣3️⃣ Presets (1) 🎨 Sprint 3
+- **load_preset** - Load preset configuration (web-dev, data-analysis, content-creation)
+
+### 1️⃣4️⃣ Interactive UX (2) 🎨 Sprint 3
+- **show_alert** - Show alert dialog to user with custom buttons
+- **ask_user_input** - Ask user for text input with modal dialog
+
+### 1️⃣5️⃣ Worker Control (2) 🎨 Sprint 3
+- **focus_worker** - Bring worker tab to focus
+- **inject_output** - Inject text into worker terminal as program output
 
 ---
 
