@@ -4,10 +4,18 @@
 ![Lint](https://img.shields.io/badge/lint-passing-brightgreen)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518.0.0-brightgreen)
 ![Platform](https://img.shields.io/badge/platform-macOS-lightgrey)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-**Simple MCP server for managing Claude workers in iTerm2**
+> **MCP server for orchestrating multiple Claude AI workers in iTerm2 tabs**
 
-Control multiple Claude CLI instances in separate iTerm tabs through a clean MCP interface.
+Control multiple Claude CLI instances through a clean [Model Context Protocol](https://modelcontextprotocol.io/) interface. Create specialized AI workers (researcher, coder, tester, etc.) that work autonomously in separate iTerm tabs, managed by a central orchestrator.
+
+**Perfect for:**
+- 🤖 Multi-agent AI workflows
+- 🔬 Research and data gathering
+- 💻 Parallel code development
+- 🧪 Automated testing scenarios
+- 📊 Complex task orchestration
 
 ---
 
@@ -16,8 +24,34 @@ Control multiple Claude CLI instances in separate iTerm tabs through a clean MCP
 - 🪟 **Worker Management** - Create/kill workers in iTerm tabs
 - 💬 **Communication** - Send commands and read output
 - 💾 **Variables** - Store data in worker sessions
+- 🎭 **AI Roles** - 9 pre-built specialist roles (researcher, coder, tester, etc.)
 - 🤖 **Claude Integration** - Direct communication with Claude CLI
 - 🔧 **Simple Architecture** - MCP server → Bash scripts → iTerm2 API
+
+---
+
+## 💡 Quick Example
+
+```javascript
+// Create a researcher worker with automatic role
+await mcp.create_worker_claude({
+  name: "Research-Agent",
+  task: "Research MCP protocol",
+  role: "researcher"  // Auto-applies researcher system prompt
+});
+
+// Create a coder worker
+await mcp.create_worker_claude({
+  name: "Code-Agent",
+  task: "Implement auth module",
+  role: "coder"
+});
+
+// Workers operate autonomously in separate iTerm tabs!
+// Orchestrator can communicate with them, read outputs, assign tasks
+```
+
+**Result:** Two AI workers with specialized roles, working independently in iTerm tabs, coordinated by your orchestrator.
 
 ---
 
@@ -45,8 +79,6 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 ---
 
 ## 📦 Available Tools (16)
-
-> **🗺️ Future features:** See [ROADMAP.md](ROADMAP.md) for planned features and milestones
 
 ### 1️⃣ Worker Lifecycle (4)
 - **create_worker** - Create new worker in iTerm tab
@@ -102,7 +134,7 @@ iTerm2 Python API
 
 ```
 claude-iterm-orchestrator/
-├── server.js              ← MCP server (500 lines)
+├── server.js              ← MCP server (552 lines)
 ├── scripts/               ← 16 bash scripts
 │   ├── create-worker.sh
 │   ├── create-worker-claude.sh
@@ -115,14 +147,16 @@ claude-iterm-orchestrator/
 │   ├── get-role-instructions.sh
 │   ├── ask-orchestrator.sh
 │   └── ... (6 more)
+├── roles/                 ← AI worker roles
+│   └── prompts.json       ← System prompts for 9 roles
 ├── tests/                 ← Test suite
 │   └── server.test.js     ← 7 tests (100% passing)
 ├── biome.json             ← Linter config
 ├── vitest.config.js       ← Test config
 ├── package.json
 ├── README.md              ← Main docs
-├── TESTING.md             ← Testing guide
-└── ROADMAP.md             ← Future features
+├── ROLE_PROMPTS.md        ← Role system guide
+└── INSTALLATION.md        ← Setup instructions
 ```
 
 ---
@@ -286,8 +320,6 @@ claude+ --version  # Should work without asking
 
 ## 🧪 Testing & Development
 
-> **📖 Detailed guide:** See [TESTING.md](TESTING.md) for complete testing documentation
-
 ### Quick Start
 
 ```bash
@@ -331,24 +363,9 @@ tests/
 ### What's Being Tested
 
 1. **MCP Protocol** - Server initialization and tools listing
-2. **Script Existence** - All 9 bash scripts are present
+2. **Script Existence** - All 16 bash scripts are present
 3. **Script Permissions** - Scripts are executable
 4. **Configuration** - Valid package.json, biome.json, vitest config
-
-### Manual Testing Bash Scripts
-
-Test individual scripts directly:
-
-```bash
-# Test variables
-./test-variables-simple.sh
-
-# Test MCP server with variables
-./test-variables-mcp.sh
-
-# Full test: Worker → Claude → Question → Answer
-./test-full-claude-mcp.sh
-```
 
 ### Testing Tools
 
@@ -411,10 +428,36 @@ MIT
 
 ---
 
-## 🗺️ Roadmap
+## 🤝 Contributing
 
-See [ROADMAP.md](ROADMAP.md) for:
-- 14 planned features
-- Implementation priorities
-- Future milestones (v2.0 - v3.1)
-- Interactive UX, advanced control, visual management
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## ⚠️ Known Issues
+
+### iTerm2 Display Artifacts
+
+**Problem:** When Claude Code outputs text with progress indicators (e.g., "Pollinating...", "Hatching..."), iTerm2 may display visual artifacts - text appears duplicated or repeated on screen.
+
+**Cause:** iTerm2 rendering issue when handling rapid screen updates with Unicode characters and progress animations. This is a visual display bug in iTerm2, not a functional problem with the orchestrator.
+
+**Impact:** Visual only - commands execute correctly and workers function properly despite the display glitches.
+
+**Workaround:**
+- Press `⌘+R` in the affected terminal to reset display
+- Adjust iTerm2 paste settings:
+  ```bash
+  defaults write com.googlecode.iterm2 QuickPasteBytesPerCall -int 256
+  defaults write com.googlecode.iterm2 QuickPasteDelayBetweenCalls -float 0.01
+  ```
+- Restart iTerm2 after applying settings
+
+**Note:** This issue is inherent to iTerm2's terminal emulation and cannot be fully resolved at the MCP server level.
+
+---
+
+## 📬 Contact
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/gagarinyury/claude-iterm-orchestrator/issues)
+- **GitHub Repository**: [gagarinyury/claude-iterm-orchestrator](https://github.com/gagarinyury/claude-iterm-orchestrator)
