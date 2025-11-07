@@ -357,6 +357,173 @@ You get an autonomous team that:
 
 ---
 
+## 🎯 Usage Scenarios
+
+### Scenario 1: Multi-Agent Committee (Already Shown Above)
+
+Multiple AI agents discuss and make decisions together. Best for complex problems requiring diverse expertise.
+
+**Use cases:** System design, architecture decisions, research synthesis, code review
+
+---
+
+### Scenario 2: Delegate Task to Single Worker
+
+Simple task delegation - orchestrator assigns work to one specialist, monitors progress.
+
+```javascript
+// Create a single coder worker
+await mcp.create_worker_claude({
+  name: "Backend-Dev",
+  task: "Implement user authentication",
+  role: "coder"
+});
+
+// Orchestrator delegates task
+await mcp.send_to_claude({
+  worker_id: "worker-backend-dev-id",
+  message: "Implement JWT authentication with refresh tokens. Use Node.js + Express."
+});
+
+// Monitor progress
+await mcp.read_from_worker({
+  worker_id: "worker-backend-dev-id",
+  lines: 50
+});
+
+// Worker works independently, orchestrator checks periodically
+```
+
+**Use cases:** Individual coding tasks, research queries, data analysis
+
+---
+
+### Scenario 3: Parallel Independent Workers
+
+Multiple workers work on different tasks simultaneously without communication.
+
+```javascript
+// Create 3 workers for parallel tasks
+await mcp.create_worker_claude({
+  name: "Frontend-Dev",
+  role: "coder",
+  task: "Build React UI"
+});
+
+await mcp.create_worker_claude({
+  name: "Backend-Dev",
+  role: "coder",
+  task: "Build API"
+});
+
+await mcp.create_worker_claude({
+  name: "Docs-Writer",
+  role: "docs",
+  task: "Write documentation"
+});
+
+// Each worker gets different task
+await mcp.send_to_claude({
+  worker_id: "frontend-id",
+  message: "Build login form component"
+});
+
+await mcp.send_to_claude({
+  worker_id: "backend-id",
+  message: "Implement /auth/login endpoint"
+});
+
+await mcp.send_to_claude({
+  worker_id: "docs-id",
+  message: "Write API documentation for auth endpoints"
+});
+
+// Workers work independently, no broadcast needed
+// Orchestrator monitors each separately
+```
+
+**Use cases:** Sprint work, parallel development, distributed tasks
+
+---
+
+### Scenario 4: Worker Without Claude CLI
+
+Create worker for bash commands, not AI agent (no Claude CLI running).
+
+```javascript
+// Create basic worker (no Claude)
+await mcp.create_worker({
+  name: "Build-Runner",
+  task: "Run build commands"
+});
+
+// Send bash commands
+await mcp.send_to_worker({
+  worker_id: "worker-build-runner-id",
+  message: "npm run build"
+});
+
+// Read build output
+await mcp.read_from_worker({
+  worker_id: "worker-build-runner-id",
+  lines: 100
+});
+```
+
+**Use cases:** Build processes, server monitoring, log watching, running scripts
+
+---
+
+### Scenario 5: Research → Implement → Test Pipeline
+
+Sequential workflow where workers pass information down the chain.
+
+```javascript
+// Step 1: Researcher investigates
+await mcp.create_worker_claude({name: "Researcher", role: "researcher"});
+await mcp.send_to_claude({
+  worker_id: "researcher-id",
+  message: "Research best practices for rate limiting in REST APIs"
+});
+
+// Orchestrator reads research results
+const research = await mcp.read_from_worker({
+  worker_id: "researcher-id",
+  lines: 100
+});
+
+// Step 2: Coder implements based on research
+await mcp.create_worker_claude({name: "Coder", role: "coder"});
+await mcp.send_to_claude({
+  worker_id: "coder-id",
+  message: `Implement rate limiting based on this research: ${research}`
+});
+
+// Step 3: Tester validates implementation
+await mcp.create_worker_claude({name: "Tester", role: "tester"});
+const code = await mcp.read_from_worker({worker_id: "coder-id", lines: 200});
+await mcp.send_to_claude({
+  worker_id: "tester-id",
+  message: `Test this rate limiting implementation: ${code}`
+});
+```
+
+**Use cases:** Research → Development → QA workflows, sequential processing
+
+---
+
+### When to Use What?
+
+| Scenario | Workers | Communication | Best For |
+|----------|---------|---------------|----------|
+| **Committee** | 3-5 | broadcast (all talk) | Complex decisions, brainstorming |
+| **Single Delegate** | 1 | send_to_claude | Simple tasks, focused work |
+| **Parallel** | 2-10 | none (independent) | Sprint work, parallel development |
+| **No Claude** | 1+ | send_to_worker | Build scripts, monitoring |
+| **Pipeline** | 2-4 | sequential (orchestrator mediates) | Research → Dev → Test |
+
+---
+
 ## 🎯 Example: Chat with Claude
 
 ```bash
@@ -393,11 +560,26 @@ You get an autonomous team that:
 - **Python** ≥ 3.8.0
 - **iTerm2** with Python API enabled
 - **macOS** (iTerm2 is macOS-only)
-- **Claude CLI** with `claude+` alias (recommended for orchestration)
+- **Claude CLI** (or other AI CLI like GLM) with bypass mode setup
+
+### Why `claude+` (Bypass Mode)?
+
+Workers need to operate **autonomously** without asking for permissions. The `claude+` alias runs Claude CLI in bypass mode, skipping all permission prompts.
+
+**Without bypass mode:**
+```
+Worker: "Can I read file X?"
+[Waits for user approval] ← Blocks orchestration!
+```
+
+**With bypass mode (`claude+`):**
+```
+Worker: [Reads file X automatically] ← Autonomous!
+```
 
 ### Setting up `claude+` alias
 
-For orchestration, workers need to run in bypass mode (skip permissions). Add this alias to your shell:
+Add this alias to your shell configuration:
 
 **macOS (Zsh - default):**
 ```bash
