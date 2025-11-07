@@ -251,6 +251,112 @@ create_worker_claude({
 
 ---
 
+## 📚 How to Use: Multi-Agent Discussion
+
+### Scenario: Design Team Discussion
+
+Create a team of AI specialists that discuss and design an authentication system together.
+
+#### Step 1: Create Workers with Roles
+
+```javascript
+// Orchestrator creates specialized workers
+await mcp.create_worker_claude({
+  name: "Research-Lead",
+  task: "Research best practices",
+  role: "researcher"
+});
+
+await mcp.create_worker_claude({
+  name: "System-Architect",
+  task: "Design system architecture",
+  role: "architect"
+});
+
+await mcp.create_worker_claude({
+  name: "Dev-Lead",
+  task: "Implement features",
+  role: "coder"
+});
+
+await mcp.create_worker_claude({
+  name: "QA-Lead",
+  task: "Test and validate",
+  role: "tester"
+});
+```
+
+#### Step 2: Announce Network
+
+```javascript
+// Let everyone know who is in the team
+await mcp.announce_network();
+
+// All workers receive:
+// "[NETWORK] Active participants: Research-Lead (researcher), System-Architect (architect),
+//  Dev-Lead (coder), QA-Lead (tester), orchestrator-123 (orchestrator)"
+```
+
+#### Step 3: Start Discussion
+
+```javascript
+// Orchestrator initiates and sets order
+await mcp.broadcast({
+  from_worker_id: "orchestrator-123",
+  message: "Task: Design authentication system for our API. Discuss approach. Speak in order: Research-Lead → System-Architect → Dev-Lead → QA-Lead"
+});
+```
+
+#### Step 4: Workers Discuss Autonomously
+
+Workers now communicate via broadcast:
+
+```
+Research-Lead: broadcast("I researched OAuth 2.0 and JWT. Recommend JWT tokens with refresh tokens for security.")
+
+System-Architect: broadcast("Agreed on JWT. I propose: Access tokens (15min), Refresh tokens (7 days), Redis for token blacklist.")
+
+Dev-Lead: broadcast("I can implement this with Node.js + jsonwebtoken library. Will need 2-3 days. Question: Do we need social login?")
+
+QA-Lead: broadcast("I'll prepare test scenarios: token expiration, refresh flow, invalid tokens. Need clarification on rate limiting.")
+
+Research-Lead: broadcast("Regarding social login - yes, recommend OAuth 2.0 with Google and GitHub providers.")
+
+System-Architect: broadcast("Rate limiting: 5 requests per minute for auth endpoints. Store in Redis.")
+```
+
+#### Step 5: Orchestrator Guides
+
+```javascript
+// Orchestrator observes discussion via read_from_worker
+// Then guides decision:
+await mcp.broadcast({
+  from_worker_id: "orchestrator-123",
+  message: "Good discussion! Decision: Implement JWT with refresh tokens + social login (Google, GitHub). Dev-Lead start coding, QA-Lead prepare tests. Deadline: 3 days."
+});
+```
+
+#### Step 6: Read Worker Outputs
+
+```javascript
+// Orchestrator monitors progress
+await mcp.read_from_worker({
+  worker_id: "worker-dev-lead-id",
+  lines: 50
+});
+```
+
+### Result
+
+You get an autonomous team that:
+- ✅ Discusses approaches
+- ✅ Asks clarifying questions
+- ✅ Makes technical decisions together
+- ✅ Coordinates work
+- ✅ Orchestrator observes and guides when needed
+
+---
+
 ## 🎯 Example: Chat with Claude
 
 ```bash
