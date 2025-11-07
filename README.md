@@ -450,5 +450,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📬 Contact
 
+- **Author**: [@gagarinyury](https://github.com/gagarinyury)
 - **GitHub Issues**: [Report bugs or request features](https://github.com/gagarinyury/claude-iterm-orchestrator/issues)
 - **GitHub Repository**: [gagarinyury/claude-iterm-orchestrator](https://github.com/gagarinyury/claude-iterm-orchestrator)
