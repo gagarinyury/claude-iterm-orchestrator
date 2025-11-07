@@ -127,6 +127,52 @@ claude-iterm-orchestrator/
 
 ---
 
+## 🎭 AI Worker Roles
+
+Create specialized AI workers with **ready-to-use system prompts** for different roles:
+
+| Role | Description | Use Case |
+|------|-------------|----------|
+| 🔵 **Researcher** | Information gathering, web search | Research topics, gather data |
+| 🟢 **Coder** | Software development | Write code, implement features |
+| 🟣 **Tester** | QA, testing, validation | Test code, find bugs |
+| 🟠 **Analyst** | Data analysis, insights | Analyze data, provide recommendations |
+| 🎨 **Writer** | Content creation | Write docs, articles, copy |
+| 🏗️ **Architect** | System design | Design architecture, plan systems |
+| 🔍 **Debugger** | Problem diagnosis | Debug issues, troubleshoot |
+| 📚 **Docs Specialist** | Technical writing | Write documentation |
+| 🛡️ **Security Auditor** | Security assessment | Find vulnerabilities |
+| 💡 **Custom** | Your own role | Create custom prompts |
+
+**📖 See [ROLE_PROMPTS.md](ROLE_PROMPTS.md) for complete system prompts!**
+
+### Quick Example: Create a Researcher
+
+```javascript
+// 1. Create worker with Claude CLI
+create_worker_claude({
+  name: "Researcher-Alpha",
+  task: "Research MCP protocol"
+})
+
+// 2. Send the researcher role prompt
+send_message({
+  worker_id: "worker-xxx",
+  message: `You are an expert researcher AI agent...
+  [full prompt from ROLE_PROMPTS.md]
+
+  Your first task: Research the Model Context Protocol and summarize findings.`
+})
+
+// 3. Read results
+read_from_worker({
+  worker_id: "worker-xxx",
+  lines: 100
+})
+```
+
+---
+
 ## 🎯 Example: Chat with Claude
 
 ```bash
