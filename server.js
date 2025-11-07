@@ -538,11 +538,39 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "broadcast",
+  {
+    description:
+      "Broadcast message to all workers and orchestrator. Available to everyone - orchestrator can broadcast to workers, workers can broadcast to each other and orchestrator.",
+    inputSchema: {
+      from_worker_id: z.string().describe("Your worker ID (sender)"),
+      message: z.string().describe("Message to broadcast to everyone"),
+    },
+  },
+  async ({ from_worker_id, message }) => {
+    const result = await runScript("broadcast.sh", [
+      from_worker_id,
+      message,
+    ]);
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ broadcast\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
 // Start server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (16 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (17 tools registered)");
 }
 
 main().catch((error) => {

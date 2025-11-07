@@ -22,7 +22,8 @@ Control multiple Claude CLI instances through a clean [Model Context Protocol](h
 ## ✨ Features
 
 - 🪟 **Worker Management** - Create/kill workers in iTerm tabs
-- 💬 **Communication** - Send commands and read output
+- 📡 **Broadcast Communication** - Workers talk to each other, orchestrator observes
+- 💬 **Direct Communication** - Send commands and read output
 - 💾 **Variables** - Store data in worker sessions
 - 🎭 **AI Roles** - 9 pre-built specialist roles (researcher, coder, tester, etc.)
 - 🤖 **Claude Integration** - Direct communication with Claude CLI
@@ -47,11 +48,19 @@ await mcp.create_worker_claude({
   role: "coder"
 });
 
-// Workers operate autonomously in separate iTerm tabs!
-// Orchestrator can communicate with them, read outputs, assign tasks
+// Orchestrator broadcasts to all workers
+await mcp.broadcast({
+  from_worker_id: "orchestrator-123",
+  message: "Task: Design authentication API"
+});
+
+// Workers can broadcast to each other and orchestrator
+// researcher → broadcast("I found OAuth 2.0 is best practice")
+// coder → broadcast("I can implement JWT tokens")
+// Workers discuss, argue, and coordinate autonomously!
 ```
 
-**Result:** Two AI workers with specialized roles, working independently in iTerm tabs, coordinated by your orchestrator.
+**Result:** Multi-agent discussion where workers communicate freely, orchestrator observes and guides.
 
 ---
 
@@ -78,7 +87,7 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ---
 
-## 📦 Available Tools (16)
+## 📦 Available Tools (17)
 
 ### 1️⃣ Worker Lifecycle (4)
 - **create_worker** - Create new worker in iTerm tab
@@ -87,10 +96,11 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 - **list_workers** - List all active workers
 - **get_worker_info** - Get detailed worker info
 
-### 2️⃣ Communication (3)
+### 2️⃣ Communication (4)
 - **send_to_worker** - Send text (no Enter)
 - **send_to_claude** - Send text + Enter (for Claude CLI)
 - **read_from_worker** - Read terminal output
+- **broadcast** - Send message to all workers and orchestrator (everyone can use)
 
 ### 3️⃣ Variables (2)
 - **set_variable** - Store data in worker session
@@ -420,7 +430,7 @@ MIT
 |--------|--------|
 | **Tests** | ✅ 7/7 passing (100%) |
 | **Linting** | ✅ All checks passed |
-| **Tools** | ✅ 16/16 working |
+| **Tools** | ✅ 17/17 working |
 | **Coverage** | MCP Protocol, Scripts, Config |
 | **Platform** | macOS (iTerm2) |
 
