@@ -566,11 +566,32 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "announce_network",
+  {
+    description:
+      "Announce network to all workers - broadcasts list of all active workers and orchestrator to everyone. Use this after creating all workers to let them know who is in the network.",
+  },
+  async () => {
+    const result = await runScript("announce-network.sh");
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.success
+            ? `✅ announce_network\n\n${result.output}`
+            : `❌ Failed\n\n${result.error}`,
+        },
+      ],
+    };
+  }
+);
+
 // Start server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("✅ Simple MCP Server V2 ready! (17 tools registered)");
+  console.error("✅ Simple MCP Server V2 ready! (18 tools registered)");
 }
 
 main().catch((error) => {

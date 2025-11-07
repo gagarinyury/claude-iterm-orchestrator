@@ -48,13 +48,17 @@ await mcp.create_worker_claude({
   role: "coder"
 });
 
-// Orchestrator broadcasts to all workers
+// After creating all workers, announce the network
+await mcp.announce_network();
+// → All workers receive: "[NETWORK] Active participants: Researcher-Agent (researcher), Code-Agent (coder), orchestrator-123 (orchestrator)"
+
+// Orchestrator broadcasts to start discussion
 await mcp.broadcast({
   from_worker_id: "orchestrator-123",
-  message: "Task: Design authentication API"
+  message: "Task: Design authentication API. Speak in order: Researcher → Coder"
 });
 
-// Workers can broadcast to each other and orchestrator
+// Workers broadcast in turn
 // researcher → broadcast("I found OAuth 2.0 is best practice")
 // coder → broadcast("I can implement JWT tokens")
 // Workers discuss, argue, and coordinate autonomously!
@@ -87,7 +91,7 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 
 ---
 
-## 📦 Available Tools (17)
+## 📦 Available Tools (18)
 
 ### 1️⃣ Worker Lifecycle (4)
 - **create_worker** - Create new worker in iTerm tab
@@ -96,11 +100,12 @@ echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_worker
 - **list_workers** - List all active workers
 - **get_worker_info** - Get detailed worker info
 
-### 2️⃣ Communication (4)
+### 2️⃣ Communication (5)
 - **send_to_worker** - Send text (no Enter)
 - **send_to_claude** - Send text + Enter (for Claude CLI)
 - **read_from_worker** - Read terminal output
 - **broadcast** - Send message to all workers and orchestrator (everyone can use)
+- **announce_network** - Broadcast network roster to all participants (orchestrator use)
 
 ### 3️⃣ Variables (2)
 - **set_variable** - Store data in worker session
@@ -430,7 +435,7 @@ MIT
 |--------|--------|
 | **Tests** | ✅ 7/7 passing (100%) |
 | **Linting** | ✅ All checks passed |
-| **Tools** | ✅ 17/17 working |
+| **Tools** | ✅ 18/18 working |
 | **Coverage** | MCP Protocol, Scripts, Config |
 | **Platform** | macOS (iTerm2) |
 
