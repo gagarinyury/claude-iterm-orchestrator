@@ -440,20 +440,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **Problem:** When Claude Code outputs text with progress indicators (e.g., "Pollinating...", "Hatching..."), iTerm2 may display visual artifacts - text appears duplicated or repeated on screen.
 
-**Cause:** iTerm2 rendering issue when handling rapid screen updates with Unicode characters and progress animations. This is a visual display bug in iTerm2, not a functional problem with the orchestrator.
+**Cause:** iTerm2 rendering issue when handling rapid screen updates with Unicode characters and progress animations.
 
-**Impact:** Visual only - commands execute correctly and workers function properly despite the display glitches.
+**Impact:** Visual only - commands execute correctly and workers function properly despite the display glitches. The duplicated text is just a display bug, not actual repeated execution.
 
-**Workaround:**
-- Press `⌘+R` in the affected terminal to reset display
-- Adjust iTerm2 paste settings:
-  ```bash
-  defaults write com.googlecode.iterm2 QuickPasteBytesPerCall -int 256
-  defaults write com.googlecode.iterm2 QuickPasteDelayBetweenCalls -float 0.01
-  ```
-- Restart iTerm2 after applying settings
-
-**Note:** This issue is inherent to iTerm2's terminal emulation and cannot be fully resolved at the MCP server level.
+**Status:** This is an inherent iTerm2 terminal emulation issue and cannot be resolved at the MCP server level. If you know how to fix this, please open an issue or PR!
 
 ---
 
