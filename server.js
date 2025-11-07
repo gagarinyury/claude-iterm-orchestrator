@@ -122,7 +122,7 @@ server.registerTool(
   "create_worker_claude",
   {
     description:
-      "Create a new worker in iTerm2 tab and auto-start Claude CLI (default: claude+ bypass mode)",
+      "Create a new worker in iTerm2 tab and auto-start Claude CLI with optional role. Role prompt will be automatically applied if specified.",
     inputSchema: {
       name: z.string().describe("Worker name"),
       task: z.string().optional().describe("Task description"),
@@ -132,9 +132,15 @@ server.registerTool(
         .describe(
           "Claude command to run: 'claude' or 'claude+' (default: 'claude+')"
         ),
+      role: z
+        .enum(["researcher", "coder", "tester", "analyst", "writer", "architect", "debugger", "docs", "security"])
+        .optional()
+        .describe(
+          "Optional role: researcher, coder, tester, analyst, writer, architect, debugger, docs, security. Role prompt will be auto-applied."
+        ),
     },
   },
-  async ({ name, task, claude_command }) => {
+  async ({ name, task, claude_command, role }) => {
     // Automatically register as orchestrator if needed
     const parentId = await ensureOrchestratorRegistered();
 
@@ -142,7 +148,8 @@ server.registerTool(
       name,
       task || "No task",
       claude_command || "claude+",
-      parentId || "",  // Pass parent_id to script
+      parentId || "",
+      role || "",  // Pass role to script
     ]);
     return {
       content: [

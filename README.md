@@ -146,28 +146,57 @@ Create specialized AI workers with **ready-to-use system prompts** for different
 
 **📖 See [ROLE_PROMPTS.md](ROLE_PROMPTS.md) for complete system prompts!**
 
-### Quick Example: Create a Researcher
+### Quick Example: Create a Researcher (Automatic Role)
 
 ```javascript
-// 1. Create worker with Claude CLI
+// ⚡ NEW: Role is applied AUTOMATICALLY!
 create_worker_claude({
   name: "Researcher-Alpha",
-  task: "Research MCP protocol"
+  task: "Research MCP protocol",
+  role: "researcher"  // ← Role prompt auto-applied!
 })
+// Worker is ready with researcher role immediately!
 
-// 2. Send the researcher role prompt
-send_message({
-  worker_id: "worker-xxx",
-  message: `You are an expert researcher AI agent...
-  [full prompt from ROLE_PROMPTS.md]
-
-  Your first task: Research the Model Context Protocol and summarize findings.`
-})
-
-// 3. Read results
+// Just read the results
 read_from_worker({
   worker_id: "worker-xxx",
   lines: 100
+})
+```
+
+**What happens automatically:**
+1. ✅ iTerm tab created
+2. ✅ Claude CLI started
+3. ✅ **Researcher role prompt sent automatically**
+4. ✅ Worker ready to work as researcher!
+
+**No manual prompt sending needed!** 🎉
+
+### Available Roles:
+- `researcher`, `coder`, `tester`, `analyst`, `writer`, `architect`, `debugger`, `docs`, `security`
+
+### Create Different Roles:
+
+```javascript
+// Coder
+create_worker_claude({
+  name: "Coder-Beta",
+  task: "Implement auth module",
+  role: "coder"
+})
+
+// Tester
+create_worker_claude({
+  name: "Tester-Gamma",
+  task: "Test API endpoints",
+  role: "tester"
+})
+
+// Security Auditor
+create_worker_claude({
+  name: "Security-Delta",
+  task: "Audit codebase",
+  role: "security"
 })
 ```
 

@@ -1,13 +1,19 @@
 #!/bin/bash
 
 # Create a new worker in iTerm2 and auto-start Claude CLI
-# Usage: create-worker-claude.sh <name> [task] [claude_command] [parent_id]
+# Usage: create-worker-claude.sh <name> [task] [claude_command] [parent_id] [role]
 
 WORKER_NAME="${1:-Worker}"
 TASK="${2:-No task}"
 CLAUDE_CMD="${3:-claude+}"  # Default: "claude+" (bypass mode), can use "claude" for normal
 PARENT_ID="${4:-}"  # Optional: parent orchestrator ID
+ROLE="${5:-}"  # Optional: role (researcher, coder, tester, etc.)
 WORKER_ID="worker-$(date +%s)-$(openssl rand -hex 3)"
+
+# Get script directory to find roles/prompts.json
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+PROMPTS_FILE="$PROJECT_DIR/roles/prompts.json"
 
 # Create Python script
 PYTHON_SCRIPT=$(cat <<EOF
@@ -76,13 +82,38 @@ async def main(connection):
         await asyncio.sleep(0.1)
         await session.async_send_text("\r")
 
+        # Wait for Claude to start
+        await asyncio.sleep(2)
+
+        # If role is specified, auto-send role prompt
+        role_applied = False
+        if "$ROLE":
+            try:
+                # Load role prompt from JSON file
+                prompts_path = "$PROMPTS_FILE"
+                with open(prompts_path, 'r') as f:
+                    prompts = json.load(f)
+                    role_prompt = prompts.get("$ROLE", "")
+
+                if role_prompt:
+                    # Send role prompt to Claude
+                    await session.async_send_text(role_prompt)
+                    await asyncio.sleep(0.1)
+                    await session.async_send_text("\r")
+                    role_applied = True
+            except Exception as e:
+                # If role prompt fails, continue anyway
+                pass
+
         result = {
             "success": True,
             "worker_id": "$WORKER_ID",
             "worker_name": "$WORKER_NAME",
             "session_id": session.session_id,
             "tab_id": tab.tab_id,
-            "claude_command": "$CLAUDE_CMD"
+            "claude_command": "$CLAUDE_CMD",
+            "role": "$ROLE" if "$ROLE" else None,
+            "role_applied": role_applied
         }
         print(json.dumps(result))
 
